@@ -1,0 +1,38 @@
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "fly-dragonflydb"
+primary_region = "sjc"
+
+[build]
+  image = "docker.dragonflydb.io/dragonflydb/dragonfly"
+
+[env]
+  ADMIN_CONSOLE = "false"
+  HOST = "fly-local-6pn"
+  PORT = "6379"
+
+[processes]
+  app = "dragonfly --logtostderr --bind fly-local-6pn --port 6379 --primary_port_http_enabled"
+
+[[mounts]]
+  source = "data"
+  destination = "/data"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 6379
+  min_machines_running = 1
+  processes = ["app"]
+  auto_start_machines = true
+  auto_stop_machines = false
+
+  [[services.ports]]
+    port = 6379
+    handlers = ["tls", 'http']
+    force_https = false
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    force_https = false

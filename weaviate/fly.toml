@@ -1,0 +1,79 @@
+app = "weaviate"
+kill_signal = "SIGINT"
+kill_timeout = 5
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# See https://weaviate.io/developers/weaviate/config-refs/env-vars
+[env]
+  # ORIGIN = "https://my-weaviate-instance.fly.dev"
+  PERSISTENCE_DATA_PATH = "/var/lib/weaviate"
+
+  ## Module Configuration
+  # ENABLE_MODULES = 'text2vec-cohere,backup-s3'
+  # DEFAULT_VECTORIZER_MODULE = 'text2vec-cohere'
+
+  ## Auth
+  ## @see https://weaviate.io/developers/weaviate/config-refs/env-vars#authentication--authorization
+  AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED = "true" # set to "false" to require authentication
+  AUTHENTICATION_APIKEY_ENABLED = "false"
+  AUTHENTICATION_OIDC_ENABLED = "false"
+  AUTHORIZATION_ADMINLIST_ENABLED = "false"
+  ## SET WITH `fly secrets set ...`
+  # AUTHENTICATION_APIKEY_ALLOWED_KEYS = "i-should-set-this-with-secrets"
+  # AUTHENTICATION_APIKEY_USERS = "set@with.secrets"
+  # AUTHORIZATION_ADMINLIST_USERS = "set@with.secrets"
+  # AUTHORIZATION_ADMINLIST_READONLY_USERS = "set@with.secrets"
+
+  ## Clustering
+  CLUSTER_GOSSIP_BIND_PORT = "7100"
+  CLUSTER_DATA_BIND_PORT = "7101"
+
+  ## Misc
+  QUERY_DEFAULTS_LIMIT = "25"
+  QUERY_MAXIMUM_RESULTS = "10000"
+  AUTOSCHEMA_ENABLED = "true"
+  LOG_LEVEL = "info"
+  LOG_FORMAT = "text"
+  PROMETHEUS_MONITORING_ENABLED = "true"
+
+[processes]
+  primary = "--host fly-local-6pn --port 8080 --scheme http"
+  replica = "--host fly-local-6pn --port 8080 --scheme http"
+
+[[mounts]]
+  source = "weaviate"
+  destination = "/var/lib/weaviate"
+  processes = ["primary", "replica"]
+
+[http_service]
+  processes = ["primary", "replica"]
+  internal_port = 8080
+  force_https = false
+  auto_stop_machines = false
+  auto_start_machines = false
+  min_machines_running = 1
+
+[[services]]
+  processes = ["primary", "replica"]
+  internal_port = 7100
+  protocol = "tcp"
+  auto_start_machines = false
+  auto_stop_machines = false
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 7100
+
+[[services]]
+  processes = ["primary", "replica"]
+  internal_port = 7101
+  protocol = "tcp"
+  auto_start_machines = false
+  auto_stop_machines = false
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 7101

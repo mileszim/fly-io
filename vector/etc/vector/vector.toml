@@ -1,0 +1,26 @@
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+
+[sources.demo_logs]
+type     = "demo_logs"
+interval = 1.0
+format   = "json"
+
+[sinks.console]
+inputs         = ["demo_logs"]
+target         = "stdout"
+type           = "console"
+encoding.codec = "json"
+
+# # Send structured data to a cost-effective long-term storage
+# [sinks.s3_archives]
+# inputs          = ["demo_logs"]    # don't sample for S3
+# type            = "aws_s3"
+# region          = "us-east-1"
+# bucket          = "my-log-archives"
+# key_prefix      = "date=%Y-%m-%d"      # daily partitions, hive friendly format
+# compression     = "gzip"               # compress final objects
+# framing.method  = "newline_delimited"  # new line delimited...
+# encoding.codec  = "json"               # ...JSON
+# batch.max_bytes = 10000000             # 10mb uncompressed

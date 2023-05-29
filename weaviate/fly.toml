@@ -28,8 +28,8 @@ primary_region = "sjc"
   # AUTHORIZATION_ADMINLIST_READONLY_USERS = "set@with.secrets"
 
   ## Clustering
-  CLUSTER_GOSSIP_BIND_PORT = "7100"
-  CLUSTER_DATA_BIND_PORT = "7101"
+  CLUSTER_GOSSIP_BIND_PORT = "7946"
+  CLUSTER_DATA_BIND_PORT = "7947"
 
   ## Misc
   QUERY_DEFAULTS_LIMIT = "25"
@@ -56,24 +56,64 @@ primary_region = "sjc"
   auto_start_machines = false
   min_machines_running = 1
 
+# GRPC
 [[services]]
   processes = ["primary", "replica"]
-  internal_port = 7100
+  internal_port = 50051
   protocol = "tcp"
   auto_start_machines = false
   auto_stop_machines = false
   min_machines_running = 0
 
   [[services.ports]]
-    port = 7100
+    port = 50051
 
+# Cluster GOSSIP
 [[services]]
   processes = ["primary", "replica"]
-  internal_port = 7101
+  internal_port = 7946
   protocol = "tcp"
   auto_start_machines = false
   auto_stop_machines = false
   min_machines_running = 0
 
   [[services.ports]]
-    port = 7101
+    port = 7946
+
+# Cluster DATA
+[[services]]
+  processes = ["primary", "replica"]
+  internal_port = 7947
+  protocol = "tcp"
+  auto_start_machines = false
+  auto_stop_machines = false
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 7947
+    handlers = ["http"]
+    force_https = false
+
+# Prometheus
+[[services]]
+  processes = ["primary", "replica"]
+  internal_port = 2112
+  protocol = "tcp"
+  auto_start_machines = false
+  auto_stop_machines = false
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 2112
+  
+  # Unknown
+[[services]]
+  processes = ["primary", "replica"]
+  internal_port = 6060
+  protocol = "tcp"
+  auto_start_machines = false
+  auto_stop_machines = false
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 6060
